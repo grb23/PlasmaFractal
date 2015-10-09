@@ -9,9 +9,16 @@ import java.util.Random;
  */
 public class PredatorHeatVision extends JComponent {
     private Random rand = new Random(System.currentTimeMillis());
+    private boolean[][] b;
 
-    public void paintComponent(Graphics g) {
+    @Override
+    protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+
+        // If the width or height changes, b gets the new width and height
+        if (b == null || b.length != getWidth() || b.length > 0 && b[0].length != getHeight()) {
+            b = new boolean[getWidth()][getHeight()];
+        }
 
         Color colorTopLeft = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
         Color colorTopRight = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
@@ -19,21 +26,21 @@ public class PredatorHeatVision extends JComponent {
         Color colorBottomRight = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
 
         g2.setColor(colorTopLeft);
-        g2.drawOval(-1, -1, 1, 1);
+        drawPoint(g2, -1, -1);
 
         g2.setColor(colorTopRight);
-        g2.drawOval(getWidth()-2, -1, 1, 1);
+        drawPoint(g2, getWidth() - 2, -1);
 
         g2.setColor(colorBottomLeft);
-        g2.drawOval(-1, getHeight()-2, 1, 1);
+        drawPoint(g2, -1, getHeight() - 2);
 
         g2.setColor(colorBottomRight);
-        g2.drawOval(getWidth()-2, getHeight()-2, 1, 1);
+        drawPoint(g2, getWidth() - 2, getHeight() - 2);
 
         rectangles(0, 0, getWidth()-1, getHeight()-1, g2, colorTopLeft, colorTopRight, colorBottomLeft, colorBottomRight);
     }
 
-    public Color averageColors(Color... colors) {
+    private Color averageColors(Color... colors) {
         int r = 0;
         int g = 0;
         int b = 0;
@@ -50,7 +57,7 @@ public class PredatorHeatVision extends JComponent {
         return new Color(r, g, b);
     }
 
-    public void rectangles(int minX, int minY, int maxX, int maxY, Graphics2D g2,
+    private void rectangles(int minX, int minY, int maxX, int maxY, Graphics2D g2,
                            Color colorTopLeft, Color colorTopRight, Color colorBottomLeft, Color colorBottomRight) {
 
         if(maxX-minX < 2 && maxY-minY < 2)
@@ -60,23 +67,23 @@ public class PredatorHeatVision extends JComponent {
 
         Color colorMidPoint = averageColors(colorTopLeft, colorTopRight, colorBottomLeft, colorBottomRight);
         g2.setColor(colorMidPoint);
-        g2.drawOval(midX - 1, midY - 1, 1, 1);
+        drawPoint(g2, midX - 1, midY - 1);
 
         Color topMidPoint = averageColors(colorTopLeft, colorTopRight);
         g2.setColor(topMidPoint);
-        g2.drawOval(midX - 1, minY - 1, 1, 1);
+        drawPoint(g2, midX - 1, minY - 1);
 
         Color MidRightPoint = averageColors(colorTopRight, colorBottomRight);
         g2.setColor(MidRightPoint);
-        g2.drawOval(maxX - 1, midY - 1, 1, 1);
+        drawPoint(g2, maxX - 1, midY - 1);
 
         Color bottomMidPoint = averageColors(colorBottomLeft, colorBottomRight);
         g2.setColor(bottomMidPoint);
-        g2.drawOval(midX - 1, maxY - 1, 1, 1);
+        drawPoint(g2, midX - 1, maxY - 1);
 
         Color MidLeftPoint = averageColors(colorTopLeft, colorBottomLeft);
         g2.setColor(MidLeftPoint);
-        g2.drawOval(minX - 1, midY - 1, 1, 1);
+        drawPoint(g2, minX - 1, midY - 1);
 
         rectangles(minX, minY, midX, midY, g2, colorTopLeft, topMidPoint, MidLeftPoint, colorMidPoint); // top left
         rectangles(midX, minY, maxX, midY, g2, topMidPoint, colorTopRight, colorMidPoint, MidRightPoint); // top right
@@ -84,4 +91,10 @@ public class PredatorHeatVision extends JComponent {
         rectangles(midX, midY, maxX, maxY, g2, colorMidPoint, MidRightPoint, bottomMidPoint, colorBottomRight); // bot right
     }
 
+    private void drawPoint(Graphics2D g2, int x, int y) {
+        if(!b[x+1][y+1]) {
+            g2.drawOval(x, y, 1, 1);
+            b[x+1][y+1] = true;
+        }
+    }
 }
