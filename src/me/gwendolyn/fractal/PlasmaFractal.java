@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * Created by Gwendolyn on 10/2/2015.
  */
-public class PredatorHeatVision extends JComponent {
+public class PlasmaFractal extends JComponent {
     private Random rand = new Random(System.currentTimeMillis());
     private boolean[][] b;
 
